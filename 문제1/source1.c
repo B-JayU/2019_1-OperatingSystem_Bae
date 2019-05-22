@@ -10,13 +10,13 @@
 #define FALSE 0
 
 int need[NUMBER_OF_CUSTOMERS + 1][NUMBER_OF_RESOURCES + 1];
-// ¸î¹ø ÇÁ·Î¼¼½º(Ã¹¹øÂ° ÀÎµ¦½º)°¡ ¸î¹øÂ° ¸®¼Ò½º(µÎ¹øÂ° ÀÎµ¦½º)¸¦ ¸î °³(value)¸¦ ¿ä±¸ÇÏ´Â°¡? 
+// ëª‡ë²ˆ í”„ë¡œì„¸ìŠ¤(ì²«ë²ˆì§¸ ì¸ë±ìŠ¤)ê°€ ëª‡ë²ˆì§¸ ë¦¬ì†ŒìŠ¤(ë‘ë²ˆì§¸ ì¸ë±ìŠ¤)ë¥¼ ëª‡ ê°œ(value)ë¥¼ ìš”êµ¬í•˜ëŠ”ê°€? 
 int allocation[NUMBER_OF_CUSTOMERS + 1][NUMBER_OF_RESOURCES + 1];
-// ¸î¹ø ÇÁ·Î¼¼½º(Ã¹¹øÂ° ÀÎµ¦½º)¿¡ ¸î¹øÂ° ¸®¼Ò½º(µÎ¹øÂ° ÀÎµ¦½º)°¡ ¸î °³(value)¸¦ ÇÒ´çµÇ¾ú´Â°¡?
+// ëª‡ë²ˆ í”„ë¡œì„¸ìŠ¤(ì²«ë²ˆì§¸ ì¸ë±ìŠ¤)ì— ëª‡ë²ˆì§¸ ë¦¬ì†ŒìŠ¤(ë‘ë²ˆì§¸ ì¸ë±ìŠ¤)ê°€ ëª‡ ê°œ(value)ë¥¼ í• ë‹¹ë˜ì—ˆëŠ”ê°€?
 int max[NUMBER_OF_CUSTOMERS + 1][NUMBER_OF_RESOURCES + 1];
-// ¸î¹ø ÇÁ·Î¼¼½º(Ã¹¹øÂ° ÀÎµ¦½º)°¡ ÇÁ·Î¼¼½º ¿ÏÀü Á¾·á¸¦ À§ÇØ ¸î¹øÂ° ¸®¼Ò½º(µÎ¹øÂ° ÀÎµ¦½º)°¡ ÃÖ´ë ¸î °³(value)°¡ ÇÊ¿äÇÑ°¡?
+// ëª‡ë²ˆ í”„ë¡œì„¸ìŠ¤(ì²«ë²ˆì§¸ ì¸ë±ìŠ¤)ê°€ í”„ë¡œì„¸ìŠ¤ ì™„ì „ ì¢…ë£Œë¥¼ ìœ„í•´ ëª‡ë²ˆì§¸ ë¦¬ì†ŒìŠ¤(ë‘ë²ˆì§¸ ì¸ë±ìŠ¤)ê°€ ìµœëŒ€ ëª‡ ê°œ(value)ê°€ í•„ìš”í•œê°€?
 int available[NUMBER_OF_RESOURCES + 1];
-// ÀÚ¿ø Å¸ÀÔº° °¡¿ë °¡´ÉÇÑ ÀÚ¿øÀÇ °³¼ö
+// ìžì› íƒ€ìž…ë³„ ê°€ìš© ê°€ëŠ¥í•œ ìžì›ì˜ ê°œìˆ˜`
 
 int main() {
 
@@ -43,151 +43,163 @@ int main() {
 			need[i][j] = max[i][j] - allocation[i][j];
 		}
 	}
-	
-	printf("------------------------------------------\n");
-	printf("      Alloc        Max        Need\n");
-	for (int i = 1; i <= NUMBER_OF_CUSTOMERS; i++) {
-		printf("P%d   ", i);
-		for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
-			printf("%2d ", allocation[i][j]);
-		printf("   ");
-		for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
-			printf("%2d ", max[i][j]);
-		printf("   ");
-		for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
-			printf("%2d ", need[i][j]);
-		printf("\n");
-	}
 
-	int *work;
-	work = (int*)malloc(sizeof(int)*(NUMBER_OF_RESOURCES + 1));
-	
-	printf("\nAvailable : ( ");
-	for (int i = 1; i <= NUMBER_OF_RESOURCES; i++)
-		printf("%d ", available[i]);
-	printf(")\n");
-
-	//ÀÚ¿ø ¿äÃ» ¾Ë°í¸®Áò
-	int request_c, *request_r;
-	srand(time(NULL));
-	request_c = rand() % NUMBER_OF_CUSTOMERS + 1;
-	request_r = (int *)malloc(sizeof(int)*(NUMBER_OF_RESOURCES + 1));
-
-	/*for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
-		request_r[i] = rand() % LIMIT_OF_NEEDS + 1;
-	}*/
-	request_c = 1;
-	request_r[1] = 0;
-	request_r[2] = 2;
-	request_r[3] = 0;
-
-	printf("\n-----------------ÀÚ¿ø¿äÃ»-----------------\n");
-	printf("P%d's request : ", request_c);
-	printf("( ");
-	for (int i = 1; i <= NUMBER_OF_RESOURCES; i++)
-		printf("%d ", request_r[i]);
-	printf(")\n");
-
-	int request_accept = TRUE;
-	for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
-		if (need[request_c][i] < request_r[i]) {
-			printf("Resource-Request Error!!!\n");
-			request_accept = FALSE;
-			break;
-		}
-	}
-
-	if (request_accept == TRUE) {
-		for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
-			if (available[i] < request_r[i]) {
-				request_accept = FALSE;
-			}
-		}
-		if (request_accept == TRUE) {
-			printf("Resoure-request accepted\n");
-			for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
-				available[i] -= request_r[i];
-				need[request_c][i] -= request_r[i];
-				allocation[request_c][i] += request_r[i];
-			}
-		}
-		else
-			printf("Resoure-request not accepted\n");
-	}
-
-	printf("Work : ( ");
-	for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
-		work[i] = available[i];
-		printf("%d ", work[i]);
-	}
-	printf(")\n");
-
-	printf("      Alloc        Max        Need\n");
-	for (int i = 1; i <= NUMBER_OF_CUSTOMERS; i++) {
-		printf("P%d   ", i);
-		for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
-			printf("%2d ", allocation[i][j]);
-		printf("   ");
-		for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
-			printf("%2d ", max[i][j]);
-		printf("   ");
-		for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
-			printf("%2d ", need[i][j]);
-		printf("\n");
-	}
-
-	printf("\n----------------¾ÈÀü¼º °ËÁõ----------------\n");
-	//¾ÈÀü¼º ¾Ë°í¸®Áò
-	int *finish;
-
-	finish = (int*)malloc(sizeof(int)*(NUMBER_OF_CUSTOMERS + 1));
-	for (int i = 1; i <= NUMBER_OF_CUSTOMERS; i++)
-		finish[i] = FALSE;
-	//
-
-	int check;
-	int finished_thread = 0;
-	int pre_finished = 0;
-	int step = 0;
-
-	do {
-		printf("STEP %d------------------------\n", ++step);
+	int exit_key = 0;
+	do
+	{
+		
+		printf("------------------------------------------\n");
+		printf("      Alloc        Max        Need\n");
 		for (int i = 1; i <= NUMBER_OF_CUSTOMERS; i++) {
+			printf("P%d   ", i);
+			for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
+				printf("%2d ", allocation[i][j]);
+			printf("   ");
+			for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
+				printf("%2d ", max[i][j]);
+			printf("   ");
+			for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
+				printf("%2d ", need[i][j]);
+			printf("\n");
+		}
 
-			if (finish[i] == TRUE) // finishe°¡ trueÀÌ¸é ´ÙÀ½ ½º·¹µå¿¡ ´ëÇÑ ÀÚ¿ø¹Ý³³À» ½ÃÇà
-				continue;
+		int *work;
+		work = (int*)malloc(sizeof(int)*(NUMBER_OF_RESOURCES + 1));
 
-			check = TRUE;
-			for (int j = 1; j <= NUMBER_OF_RESOURCES; j++) { // ÀÚ¿øÇÊ¿ä·®ÀÌ ÇöÀç °¡¿ë·®º¸´Ù Å« °æ¿ì... break¸¦ ÅëÇØ¼­ ¹Ýº¹¹®À» ºüÁ®³ª¿À°í
-				if (need[i][j] > work[j]) {
-					check = FALSE;
-					break;
+		printf("\nAvailable : ( ");
+		for (int i = 1; i <= NUMBER_OF_RESOURCES; i++)
+			printf("%d ", available[i]);
+		printf(")\n");
+
+		//ìžì› ìš”ì²­ ì•Œê³ ë¦¬ì¦˜
+		int request_c, *request_r;
+		srand(time(NULL));
+		request_c = rand() % NUMBER_OF_CUSTOMERS + 1;
+		request_r = (int *)malloc(sizeof(int)*(NUMBER_OF_RESOURCES + 1));
+		/*
+		for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
+			request_r[i] = rand() % 5;
+		}
+		*/
+		request_c = 1;
+		request_r[1] = 0;
+	    request_r[2] = 2;
+		request_r[3] = 0;
+
+		printf("\n-----------------ìžì›ìš”ì²­-----------------\n");
+		printf("P%d's request : ", request_c);
+		printf("( ");
+		for (int i = 1; i <= NUMBER_OF_RESOURCES; i++)
+			printf("%d ", request_r[i]);
+		printf(")\n");
+
+		int request_accept = TRUE;
+		for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
+			if (need[request_c][i] < request_r[i]) {
+				printf("Resource-Request Error!!!\n");
+				request_accept = FALSE;
+				break;
+			}
+		}
+		//
+
+
+		if (request_accept == TRUE) {
+			for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
+				if (available[i] < request_r[i]) {
+					request_accept = FALSE;
 				}
 			}
-			if (check == FALSE) // ÇØ´ç ½º·¹µå°¡ ÇöÀç »óÈ²¿¡¼­ ÀÛ¾÷À» Á¾·áÇÏÁö ¸øÇÏ¸é ´ë±âÇÏµµ·Ï ÇÑ´Ù.
-				continue;
-
-			// ÇöÀç °¡¿ë·®À¸·Î ÀÚ¿ø ÇÊ¿ä·®À» ÃæÁ·ÇÒ ¼ö ÀÖ´Ù¸é... ÀÚ¿øÇÊ¿ä·®¸¸Å­ Á¦°øÇØÁÖ°í ½º·¹µå°¡ ÀÛ¾÷¼öÇàÀ» ³¡³»°Ô µÇ¹Ç·Î
-			// ½º·¹µå¿¡ ÇöÀç ÇÒ´çµÈ ÀÚ¿ø·®À» °¡¿ë·®¿¡ Ãß°¡ÇØÁØ´Ù.
-			// ±×¸®°í ÇØ´ç ½º·¹µå´Â finish¸¦ true·Î ¹Ù²ãÁÖ°í ¿Ï·áµÈ ½º·¹µå¸¦ 1 Áõ°¡½ÃÄÑÁØ´Ù.
-
-			printf("P%d Á¾·á... Work: ( ", i);
-			for (int j = 1; j <= NUMBER_OF_RESOURCES; j++) {
-				work[j] += allocation[i][j];
-				printf("%d ", work[j]);
+			if (request_accept == TRUE) {
+				printf("Resoure-request accepted\n");
+				for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
+					available[i] -= request_r[i];
+					need[request_c][i] -= request_r[i];
+					allocation[request_c][i] += request_r[i];
+				}
 			}
-			printf(")\n");
-			finished_thread++;
-			finish[i] = TRUE;
+			else
+				printf("Resoure-request not accepted\n");
 		}
-		printf("\n");
-	} while (finished_thread != NUMBER_OF_CUSTOMERS && finished_thread != pre_finished);
 
-	printf("\n----------Result of Safety Algorithm----------\n");
-	if (finished_thread == NUMBER_OF_CUSTOMERS) {
-		printf("SAFE\n");
-	}
-	else {
-		printf("Not safe\n");
-	}
+		printf("Work : ( ");
+		for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
+			work[i] = available[i];
+			printf("%d ", work[i]);
+		}
+		printf(")\n");
+
+		printf("      Alloc        Max        Need\n");
+		for (int i = 1; i <= NUMBER_OF_CUSTOMERS; i++) {
+			printf("P%d   ", i);
+			for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
+				printf("%2d ", allocation[i][j]);
+			printf("   ");
+			for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
+				printf("%2d ", max[i][j]);
+			printf("   ");
+			for (int j = 1; j <= NUMBER_OF_RESOURCES; j++)
+				printf("%2d ", need[i][j]);
+			printf("\n");
+		}
+
+		printf("\n----------------ì•ˆì „ì„± ê²€ì¦----------------\n");
+		//ì•ˆì „ì„± ì•Œê³ ë¦¬ì¦˜
+		int *finish;
+
+		finish = (int*)malloc(sizeof(int)*(NUMBER_OF_CUSTOMERS + 1));
+		for (int i = 1; i <= NUMBER_OF_CUSTOMERS; i++)
+			finish[i] = FALSE;
+		//
+
+		int check;
+		int finished_thread = 0;
+		int pre_finished = 0;
+		int step = 0;
+
+		do {
+			printf("STEP %d------------------------\n", ++step);
+			for (int i = 1; i <= NUMBER_OF_CUSTOMERS; i++) {
+
+				if (finish[i] == TRUE) // finisheê°€ trueì´ë©´ ë‹¤ìŒ ìŠ¤ë ˆë“œì— ëŒ€í•œ ìžì›ë°˜ë‚©ì„ ì‹œí–‰
+					continue;
+
+				check = TRUE;
+				for (int j = 1; j <= NUMBER_OF_RESOURCES; j++) { // ìžì›í•„ìš”ëŸ‰ì´ í˜„ìž¬ ê°€ìš©ëŸ‰ë³´ë‹¤ í° ê²½ìš°... breakë¥¼ í†µí•´ì„œ ë°˜ë³µë¬¸ì„ ë¹ ì ¸ë‚˜ì˜¤ê³ 
+					if (need[i][j] > work[j]) {
+						check = FALSE;
+						break;
+					}
+				}
+				if (check == FALSE) // í•´ë‹¹ ìŠ¤ë ˆë“œê°€ í˜„ìž¬ ìƒí™©ì—ì„œ ìž‘ì—…ì„ ì¢…ë£Œí•˜ì§€ ëª»í•˜ë©´ ëŒ€ê¸°í•˜ë„ë¡ í•œë‹¤.
+					continue;
+
+				// í˜„ìž¬ ê°€ìš©ëŸ‰ìœ¼ë¡œ ìžì› í•„ìš”ëŸ‰ì„ ì¶©ì¡±í•  ìˆ˜ ìžˆë‹¤ë©´... ìžì›í•„ìš”ëŸ‰ë§Œí¼ ì œê³µí•´ì£¼ê³  ìŠ¤ë ˆë“œê°€ ìž‘ì—…ìˆ˜í–‰ì„ ëë‚´ê²Œ ë˜ë¯€ë¡œ
+				// ìŠ¤ë ˆë“œì— í˜„ìž¬ í• ë‹¹ëœ ìžì›ëŸ‰ì„ ê°€ìš©ëŸ‰ì— ì¶”ê°€í•´ì¤€ë‹¤.
+				// ê·¸ë¦¬ê³  í•´ë‹¹ ìŠ¤ë ˆë“œëŠ” finishë¥¼ trueë¡œ ë°”ê¿”ì£¼ê³  ì™„ë£Œëœ ìŠ¤ë ˆë“œë¥¼ 1 ì¦ê°€ì‹œì¼œì¤€ë‹¤.
+
+				printf("P%d ì¢…ë£Œ... Work: ( ", i);
+				for (int j = 1; j <= NUMBER_OF_RESOURCES; j++) {
+					work[j] += allocation[i][j];
+					printf("%d ", work[j]);
+				}
+				printf(")\n");
+				finished_thread++;
+				finish[i] = TRUE;
+			}
+			printf("\n");
+		} while (finished_thread != NUMBER_OF_CUSTOMERS && finished_thread != pre_finished);
+
+		printf("\n----------Result of Safety Algorithm----------\n");
+		if (finished_thread == NUMBER_OF_CUSTOMERS) {
+			printf("SAFE\n");
+		}
+		else {
+			printf("Not safe\n");
+		}
+
+		printf("\nRequest resource 0 or Exit 1 : ");
+		scanf("%d", &exit_key);
+
+	}while (exit_key == 0);
 }
