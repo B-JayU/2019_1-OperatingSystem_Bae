@@ -21,7 +21,7 @@ int available[NUMBER_OF_RESOURCES + 1];
 int main() {
 
 	FILE *fp, *fp2;
-	
+
 	if ((fp = fopen("resources_max.txt", "r")) == NULL) {
 		printf("File not found");
 		exit(0);
@@ -47,7 +47,7 @@ int main() {
 	int exit_key = 0;
 	do
 	{
-		
+
 		printf("------------------------------------------\n");
 		printf("      Alloc        Max        Need\n");
 		for (int i = 1; i <= NUMBER_OF_CUSTOMERS; i++) {
@@ -76,35 +76,55 @@ int main() {
 		srand(time(NULL));
 		request_c = rand() % NUMBER_OF_CUSTOMERS + 1;
 		request_r = (int *)malloc(sizeof(int)*(NUMBER_OF_RESOURCES + 1));
-		/*
+		
 		for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
-			request_r[i] = rand() % 5;
+		request_r[i] = rand() % 5;
 		}
-		*/
-		request_c = 1;
+		
+		/*request_c = 1;
 		request_r[1] = 0;
-	    request_r[2] = 2;
-		request_r[3] = 0;
+		request_r[2] = 2;
+		request_r[3] = 0;*/
 
 		printf("\n-----------------자원요청-----------------\n");
 		printf("P%d's request : ", request_c);
 		printf("( ");
+		
+		int error_check = FALSE;
 		for (int i = 1; i <= NUMBER_OF_RESOURCES; i++)
 			printf("%d ", request_r[i]);
+		printf(") <= ");
+		printf("P%d's needs : ", request_c);
+		printf("( ");
+		for (int i = 1; i <= NUMBER_OF_RESOURCES; i++)
+			printf("%d ", need[request_c][i]);
 		printf(")\n");
 
-		int request_accept = TRUE;
+
+		
+		
 		for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
 			if (need[request_c][i] < request_r[i]) {
-				printf("Resource-Request Error!!!\n");
-				request_accept = FALSE;
+				printf("Resource-Request Error!!!\n\n");
+				error_check = TRUE;
 				break;
 			}
 		}
 		//
 
-
-		if (request_accept == TRUE) {
+		int request_accept = TRUE;
+		if (error_check == FALSE) {
+			printf("P%d's request : ", request_c);
+			printf("( ");
+			for (int i = 1; i <= NUMBER_OF_RESOURCES; i++)
+				printf("%d ", request_r[i]);
+			printf(") <= ");
+			printf("available : ");
+			printf("( ");
+			for (int i = 1; i <= NUMBER_OF_RESOURCES; i++)
+				printf("%d ", available[i]);
+			printf(")\n");
+		
 			for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
 				if (available[i] < request_r[i]) {
 					request_accept = FALSE;
@@ -122,7 +142,7 @@ int main() {
 				printf("Resoure-request not accepted\n");
 		}
 
-		printf("Work : ( ");
+		printf("\nWork : ( ");
 		for (int i = 1; i <= NUMBER_OF_RESOURCES; i++) {
 			work[i] = available[i];
 			printf("%d ", work[i]);
@@ -160,8 +180,16 @@ int main() {
 		do {
 			printf("STEP %d------------------------\n", ++step);
 			for (int i = 1; i <= NUMBER_OF_CUSTOMERS; i++) {
+				if (finish[i] == TRUE)
+					printf(" F[%d] : T/", i);
+				else
+					printf(" F[%d] : F/", i);
+			}
+			printf("\n");
 
-				if (finish[i] == TRUE) // finishe가 true이면 다음 스레드에 대한 자원반납을 시행
+			for (int i = 1; i <= NUMBER_OF_CUSTOMERS; i++) {
+
+				if (finish[i] == TRUE) // finish가 true이면 다음 스레드에 대한 자원반납을 시행
 					continue;
 
 				check = TRUE;
@@ -195,11 +223,11 @@ int main() {
 			printf("SAFE\n");
 		}
 		else {
-			printf("Not safe\n");
+			printf("Unsafe\n");
 		}
 
 		printf("\nRequest resource 0 or Exit 1 : ");
 		scanf("%d", &exit_key);
 
-	}while (exit_key == 0);
+	} while (exit_key == 0);
 }
