@@ -1,6 +1,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
+#define FALSE 0
+#define TRUE 1
+#define MAX_SIZE 20
 
 typedef struct item* itemPointer;
 typedef struct item {
@@ -13,23 +16,27 @@ typedef struct node {
 	item info;
 }node;
 
-itemPointer *request_p; // ÇÁ·Î¼¼½º°¡ ¿äÃ»ÇÑ ÀÚ¿øµéÀ» ÀúÀåÇÏ´Â ¿¬°á¸®½ºÆ®
-itemPointer *allocation_r; // ¸®¼Ò½º°¡ ÇÒ´çµÈ ÇÁ·Î¼¼½º¸¦ ´ëÇÑ Á¤º¸ ÀúÀåÇÏ´Â ¿¬°á¸®½ºÆ®
+itemPointer *request_p; // í”„ë¡œì„¸ìŠ¤ê°€ ìš”ì²­í•œ ìì›ë“¤ì„ ì €ì¥í•˜ëŠ” ì—°ê²°ë¦¬ìŠ¤íŠ¸
+itemPointer *allocation_r; // ë¦¬ì†ŒìŠ¤ê°€ í• ë‹¹ëœ í”„ë¡œì„¸ìŠ¤ë¥¼ ëŒ€í•œ ì •ë³´ ì €ì¥í•˜ëŠ” ì—°ê²°ë¦¬ìŠ¤íŠ¸
+itemPointer *wait_for;
 
 int *cycle_p;
 int count = 0;
+int *visited;
+int p_num, r_num; // í”„ë¡œì„¸ìŠ¤ ìˆ˜ì™€ ìì›ì˜ ìˆ˜ 
+int cycle[MAX_SIZE];
 
 void request_edge(node *, node *);
 void allocation_edge(node *, node *);
-void foundCycle(int);
+void dfs(int, int);
 
 int main() {
 
 	FILE *fp;
-	int p_num, r_num; // ÇÁ·Î¼¼½º ¼ö¿Í ÀÚ¿øÀÇ ¼ö
+	int p_num, r_num; // í”„ë¡œì„¸ìŠ¤ ìˆ˜ì™€ ìì›ì˜ ìˆ˜
 
 	if ((fp = fopen("input.txt", "r")) == NULL) {
-		printf("File NOT found");
+		printf("File nOT found");
 		exit(0);
 	}
 
@@ -51,10 +58,10 @@ int main() {
 		fscanf(fp, "%c%d\n", &nB.type, &nB.info.num);
 		nB.info.next = NULL;
 
-		if (nA.type == 'R') {// ÇÒ´ç°£¼±ÀÌ¸é
+		if (nA.type == 'R') {// í• ë‹¹ê°„ì„ ì´ë©´
 			allocation_edge(&nA, &nB);
 		}
-		else { // ¿äÃ»°£¼±ÀÌ¸é
+		else { // ìš”ì²­ê°„ì„ ì´ë©´
 			request_edge(&nA, &nB);
 		}
 	}
@@ -76,18 +83,40 @@ int main() {
 	}
 	printf("\n");
 
+	wait_for = (itemPointer*)malloc(sizeof(itemPointer) * (p_num + 1));
+	for (int i = 1; i <= p_num; i++)
+		wait_for[i] = NULL;
+	
+	item *temp;
 	printf("Adjacency list of wait-for graph\n");
 	for (int i = 1; i <= p_num; i++) {
 		printf("[P%d] : ", i);
 		for (search = request_p[i]; search; search = search->next) {
 			printf("P%d ", allocation_r[search->num]->num);
+
+			//wait_for graph ìƒì„±í•˜ê¸°
+			temp = (item*)malloc(sizeof(item));
+			temp->num = allocation_r[search->num]->num;
+			temp->next = NULL;
+
+			if (wait_for[i] == NULL)
+				wait_for[i] = temp;
+			else {
+				temp->next = wait_for[i];
+				wait_for[i] = temp;
+			}
 		}
 		printf("\n");
 	}
 	printf("\n");
 
 	printf("Lists of the cycles founded\n");
+	visited = (int*)malloc(sizeof(int)*(p_num + 1));
+	for (int i = 1; i <= p_num; i++)
+		visited[i] = FALSE;
 	
+	dfs(1,1);
+
 	return 0;
 }
 
@@ -116,6 +145,21 @@ void request_edge(node *a, node *b) {
 	}
 }
 
-void foundCycle(int n) {
-	
+void dfs(int start, int node) {
+	if (visited[node]) {
+		if (node == start) {
+			for (int i = 0; i < count; i++) {
+				printf("%d ", cycle[i]);
+			}
+		}
+		printf("\n");
+		return;
+	}
+	visited[node] = TRUE;
+	cycle[count++] = node;
+	for (item *search = wait_for[node]; search; search = search->next)
+		dfs(start, search->num);
+
+	visited[node] = FALSE;
+	count--;
 }
